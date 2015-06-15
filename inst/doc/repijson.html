@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="author" content="Thomas Finnie; Andy South; Ellie Sherrard-Smith; Ana Bento, Thibaut Jombart" />
+
+<meta name="date" content="2015-06-15" />
+
+<title>repijson</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<link href="data:text/css,body%20%7B%0A%20%20background%2Dcolor%3A%20%23fff%3B%0A%20%20margin%3A%201em%20auto%3B%0A%20%20max%2Dwidth%3A%20700px%3B%0A%20%20overflow%3A%20visible%3B%0A%20%20padding%2Dleft%3A%202em%3B%0A%20%20padding%2Dright%3A%202em%3B%0A%20%20font%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0A%20%20font%2Dsize%3A%2014px%3B%0A%20%20line%2Dheight%3A%201%2E35%3B%0A%7D%0A%0A%23header%20%7B%0A%20%20text%2Dalign%3A%20center%3B%0A%7D%0A%0A%23TOC%20%7B%0A%20%20clear%3A%20both%3B%0A%20%20margin%3A%200%200%2010px%2010px%3B%0A%20%20padding%3A%204px%3B%0A%20%20width%3A%20400px%3B%0A%20%20border%3A%201px%20solid%20%23CCCCCC%3B%0A%20%20border%2Dradius%3A%205px%3B%0A%0A%20%20background%2Dcolor%3A%20%23f6f6f6%3B%0A%20%20font%2Dsize%3A%2013px%3B%0A%20%20line%2Dheight%3A%201%2E3%3B%0A%7D%0A%20%20%23TOC%20%2Etoctitle%20%7B%0A%20%20%20%20font%2Dweight%3A%20bold%3B%0A%20%20%20%20font%2Dsize%3A%2015px%3B%0A%20%20%20%20margin%2Dleft%3A%205px%3B%0A%20%20%7D%0A%0A%20%20%23TOC%20ul%20%7B%0A%20%20%20%20padding%2Dleft%3A%2040px%3B%0A%20%20%20%20margin%2Dleft%3A%20%2D1%2E5em%3B%0A%20%20%20%20margin%2Dtop%3A%205px%3B%0A%20%20%20%20margin%2Dbottom%3A%205px%3B%0A%20%20%7D%0A%20%20%23TOC%20ul%20ul%20%7B%0A%20%20%20%20margin%2Dleft%3A%20%2D2em%3B%0A%20%20%7D%0A%20%20%23TOC%20li%20%7B%0A%20%20%20%20line%2Dheight%3A%2016px%3B%0A%20%20%7D%0A%0Atable%20%7B%0A%20%20margin%3A%201em%20auto%3B%0A%20%20border%2Dwidth%3A%201px%3B%0A%20%20border%2Dcolor%3A%20%23DDDDDD%3B%0A%20%20border%2Dstyle%3A%20outset%3B%0A%20%20border%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0A%20%20border%2Dwidth%3A%202px%3B%0A%20%20padding%3A%205px%3B%0A%20%20border%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0A%20%20border%2Dwidth%3A%201px%3B%0A%20%20border%2Dstyle%3A%20inset%3B%0A%20%20line%2Dheight%3A%2018px%3B%0A%20%20padding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0A%20%20border%2Dleft%2Dstyle%3A%20none%3B%0A%20%20border%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0A%0Ap%20%7B%0A%20%20margin%3A%200%2E5em%200%3B%0A%7D%0A%0Ablockquote%20%7B%0A%20%20background%2Dcolor%3A%20%23f6f6f6%3B%0A%20%20padding%3A%200%2E25em%200%2E75em%3B%0A%7D%0A%0Ahr%20%7B%0A%20%20border%2Dstyle%3A%20solid%3B%0A%20%20border%3A%20none%3B%0A%20%20border%2Dtop%3A%201px%20solid%20%23777%3B%0A%20%20margin%3A%2028px%200%3B%0A%7D%0A%0Adl%20%7B%0A%20%20margin%2Dleft%3A%200%3B%0A%7D%0A%20%20dl%20dd%20%7B%0A%20%20%20%20margin%2Dbottom%3A%2013px%3B%0A%20%20%20%20margin%2Dleft%3A%2013px%3B%0A%20%20%7D%0A%20%20dl%20dt%20%7B%0A%20%20%20%20font%2Dweight%3A%20bold%3B%0A%20%20%7D%0A%0Aul%20%7B%0A%20%20margin%2Dtop%3A%200%3B%0A%7D%0A%20%20ul%20li%20%7B%0A%20%20%20%20list%2Dstyle%3A%20circle%20outside%3B%0A%20%20%7D%0A%20%20ul%20ul%20%7B%0A%20%20%20%20margin%2Dbottom%3A%200%3B%0A%20%20%7D%0A%0Apre%2C%20code%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20color%3A%20%23333%3B%0A%7D%0Apre%20%7B%0A%20%20white%2Dspace%3A%20pre%2Dwrap%3B%20%20%20%20%2F%2A%20Wrap%20long%20lines%20%2A%2F%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20margin%3A%205px%200px%2010px%200px%3B%0A%20%20padding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0A%0Acode%20%7B%0A%20%20font%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0A%20%20font%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0A%20%20padding%3A%202px%200px%3B%0A%7D%0A%0Adiv%2Efigure%20%7B%0A%20%20text%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0A%20%20background%2Dcolor%3A%20%23FFFFFF%3B%0A%20%20padding%3A%202px%3B%0A%20%20border%3A%201px%20solid%20%23DDDDDD%3B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20border%3A%201px%20solid%20%23CCCCCC%3B%0A%20%20margin%3A%200%205px%3B%0A%7D%0A%0Ah1%20%7B%0A%20%20margin%2Dtop%3A%200%3B%0A%20%20font%2Dsize%3A%2035px%3B%0A%20%20line%2Dheight%3A%2040px%3B%0A%7D%0A%0Ah2%20%7B%0A%20%20border%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0A%20%20padding%2Dtop%3A%2010px%3B%0A%20%20padding%2Dbottom%3A%202px%3B%0A%20%20font%2Dsize%3A%20145%25%3B%0A%7D%0A%0Ah3%20%7B%0A%20%20border%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0A%20%20padding%2Dtop%3A%2010px%3B%0A%20%20font%2Dsize%3A%20120%25%3B%0A%7D%0A%0Ah4%20%7B%0A%20%20border%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0A%20%20margin%2Dleft%3A%208px%3B%0A%20%20font%2Dsize%3A%20105%25%3B%0A%7D%0A%0Ah5%2C%20h6%20%7B%0A%20%20border%2Dbottom%3A%201px%20solid%20%23ccc%3B%0A%20%20font%2Dsize%3A%20105%25%3B%0A%7D%0A%0Aa%20%7B%0A%20%20color%3A%20%230033dd%3B%0A%20%20text%2Ddecoration%3A%20none%3B%0A%7D%0A%20%20a%3Ahover%20%7B%0A%20%20%20%20color%3A%20%236666ff%3B%20%7D%0A%20%20a%3Avisited%20%7B%0A%20%20%20%20color%3A%20%23800080%3B%20%7D%0A%20%20a%3Avisited%3Ahover%20%7B%0A%20%20%20%20color%3A%20%23BB00BB%3B%20%7D%0A%20%20a%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0A%20%20%20%20text%2Ddecoration%3A%20underline%3B%20%7D%0A%20%20a%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0A%20%20%20%20text%2Ddecoration%3A%20underline%3B%20%7D%0A%0A%2F%2A%20Class%20described%20in%20https%3A%2F%2Fbenjeffrey%2Ecom%2Fposts%2Fpandoc%2Dsyntax%2Dhighlighting%2Dcss%0A%20%20%20Colours%20from%20https%3A%2F%2Fgist%2Egithub%2Ecom%2Frobsimmons%2F1172277%20%2A%2F%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20Keyword%20%2A%2F%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%2F%2A%20DataType%20%2A%2F%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%2F%2A%20DecVal%20%28decimal%20values%29%20%2A%2F%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20BaseN%20%2A%2F%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20Float%20%2A%2F%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20Char%20%2A%2F%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20String%20%2A%2F%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%2F%2A%20Comment%20%2A%2F%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%2F%2A%20OtherToken%20%2A%2F%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20AlertToken%20%2A%2F%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20Function%20calls%20%2A%2F%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%2F%2A%20ErrorTok%20%2A%2F%0A%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+<div id="header">
+<h1 class="title">repijson</h1>
+<h4 class="author"><em>Thomas Finnie; Andy South; Ellie Sherrard-Smith; Ana Bento, Thibaut Jombart</em></h4>
+<h4 class="date"><em>2015-06-15</em></h4>
+</div>
+
+
+<p><em>EpiJSON</em> is a generic JSON format for storing epidemiological data.</p>
+<p><em>repijson</em> is an R package that allows conversion between EpiJSON files and R data formats.</p>
+<p>This vignette is a demonstration of the package <em>repijson</em>.</p>
+<p>Epidemiological data is often stored and transferred as spread-sheets, databases, and text files with little standardisation in row, column and field names. A universal format enabling the coherent storage and transfer of these data is lacking. In many cases where transfer does occur, there is room for misinterpretation and preventable errors may be introduced into reports and analyses.</p>
+<p><em>EpiJSON</em> provides a potential solution for the unambiguous storage and transfer of epidemiological data. <em>repijson</em> facilitates the use of EpiJSON within R.</p>
+<div id="installing-repijson" class="section level2">
+<h2># Installing <em>repijson</em></h2>
+<p>To install the development version from github:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(devtools)
+<span class="kw">install_github</span>(<span class="st">&quot;hackout2/repijson&quot;</span>)</code></pre>
+<p>Then, to load the package, use:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;repijson&quot;</span>)</code></pre>
+</div>
+<div id="the-epijson-format" class="section level1">
+<h1>The <em>EpiJSON</em> format</h1>
+<p>This is a simplified representation of the <em>EpiJSON</em> format.</p>
+<p><img src="data:image/png;base64,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" /></p>
+<p>The <em>repijson</em> objects used to store <em>EpiJSON</em> are represented in the following diagram. <img src="data:image/png;base64,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" /></p>
+</div>
+<div id="first-simple-example-creating-an-repijson-object-from-a-dataframe" class="section level1">
+<h1>First simple example creating an repijson object from a dataframe</h1>
+<p><code>toyll</code> is a small example dataframe within the <code>repijson</code> package. It follows the structure of a disease outbreak line list, with individuals in rows and data stored in columns. This is what the first 3 rows and 8 columns look like :</p>
+<pre class="sourceCode r"><code class="sourceCode r">toyll[<span class="dv">1</span>:<span class="dv">3</span>,<span class="dv">1</span>:<span class="dv">8</span>]</code></pre>
+<pre><code>##   id  name        dob gender date.of.onset date.of.admission
+## 1  A   Tom 1981-01-12   male    2014-12-28              &lt;NA&gt;
+## 2  B  Andy 1980-11-11   male    2014-12-29        2015-01-05
+## 3 3D Ellie 1982-02-10 female    2015-01-03        2015-01-12
+##   date.of.discharge    hospital
+## 1              &lt;NA&gt;        &lt;NA&gt;
+## 2              &lt;NA&gt;    St Marys
+## 3        2015-01-17 Whittington</code></pre>
+<p>The example below creates an <code>ejObject</code> from the first 3 rows. It assigns the columns “name” and “gender” as <code>record attributes</code>. It defines two <code>events</code>, “admission” and “discharge”. The “hospital” column is assigned as an <code>attribute</code> of the first event.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co">#converting dates to date format</span>
+toyll$date.of.admission &lt;-<span class="st"> </span><span class="kw">as.POSIXct</span>(toyll$date.of.admission)
+toyll$date.of.discharge &lt;-<span class="st"> </span><span class="kw">as.POSIXct</span>(toyll$date.of.discharge)
+<span class="co">#create ejObject</span>
+ejOb &lt;-<span class="st"> </span><span class="kw">as.ejObject</span>(toyll[<span class="dv">1</span>:<span class="dv">3</span>,],
+                  <span class="dt">recordAttributes=</span><span class="kw">c</span>(<span class="st">&quot;name&quot;</span>,<span class="st">&quot;gender&quot;</span>),
+                  <span class="dt">eventDefinitions=</span><span class="kw">list</span>(
+                      <span class="kw">define_ejEvent</span>(<span class="dt">name=</span><span class="st">&quot;admission&quot;</span>, <span class="dt">date=</span><span class="st">&quot;date.of.admission&quot;</span>,<span class="dt">attributes=</span><span class="st">&quot;hospital&quot;</span>),
+                      <span class="kw">define_ejEvent</span>(<span class="dt">name=</span><span class="st">&quot;discharge&quot;</span>, <span class="dt">date=</span><span class="st">&quot;date.of.discharge&quot;</span>)
+                  ))
+<span class="co">#display ejObject</span>
+ejOb</code></pre>
+<pre><code>## {
+##     &quot;metadata&quot;: [
+## 
+##     ],
+##     &quot;records&quot;: [
+##         {
+##             &quot;id&quot;: 1,
+##             &quot;attributes&quot;: [
+##                 {
+##                     &quot;name&quot;: &quot;name&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;Tom&quot;
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;gender&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;male&quot;
+##                 }
+##             ],
+##             &quot;events&quot;: [
+## 
+##             ]
+##         },
+##         {
+##             &quot;id&quot;: 2,
+##             &quot;attributes&quot;: [
+##                 {
+##                     &quot;name&quot;: &quot;name&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;Andy&quot;
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;gender&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;male&quot;
+##                 }
+##             ],
+##             &quot;events&quot;: [
+##                 {
+##                     &quot;id&quot;: 1,
+##                     &quot;name&quot;: &quot;admission&quot;,
+##                     &quot;date&quot;: &quot;2015-01-05T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;hospital&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;St Marys&quot;
+##                         }
+##                     ]
+##                 }
+##             ]
+##         },
+##         {
+##             &quot;id&quot;: 3,
+##             &quot;attributes&quot;: [
+##                 {
+##                     &quot;name&quot;: &quot;name&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;Ellie&quot;
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;gender&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;female&quot;
+##                 }
+##             ],
+##             &quot;events&quot;: [
+##                 {
+##                     &quot;id&quot;: 1,
+##                     &quot;name&quot;: &quot;admission&quot;,
+##                     &quot;date&quot;: &quot;2015-01-12T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;hospital&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;Whittington&quot;
+##                         }
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 2,
+##                     &quot;name&quot;: &quot;discharge&quot;,
+##                     &quot;date&quot;: &quot;2015-01-17T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+## 
+##                     ]
+##                 }
+##             ]
+##         }
+##     ]
+## }
+## </code></pre>
+<p>Load the required packages for further examples.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(OutbreakTools)</code></pre>
+<pre><code>## Loading required package: ggplot2
+## Loading required package: network
+## network: Classes for Relational Data
+## Version 1.12.0 created on 2015-03-04.
+## copyright (c) 2005, Carter T. Butts, University of California-Irvine
+##                     Mark S. Handcock, University of California -- Los Angeles
+##                     David R. Hunter, Penn State University
+##                     Martina Morris, University of Washington
+##                     Skye Bender-deMoll, University of Washington
+##  For citation information, type citation(&quot;network&quot;).
+##  Type help(&quot;network-package&quot;) to get started.
+## 
+## Loading required package: knitr
+##  OutbreakTools 0.1-13 has been loaded</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(sp)
+<span class="kw">library</span>(HistData)</code></pre>
+<p>Creating example dataframe 1.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(Snow.deaths)</code></pre>
+<p>Adding some dates, pumps, some genders</p>
+<pre class="sourceCode r"><code class="sourceCode r">simulated &lt;-<span class="st"> </span>Snow.deaths
+simulated$gender &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;male&quot;</span>,<span class="st">&quot;female&quot;</span>)[(<span class="kw">runif</span>(<span class="kw">nrow</span>(simulated))&gt;<span class="fl">0.5</span>) +<span class="dv">1</span>]
+simulated$date &lt;-<span class="st"> </span><span class="kw">as.POSIXct</span>(<span class="st">&quot;1854-04-05&quot;</span>) +<span class="st"> </span><span class="kw">rnorm</span>(<span class="kw">nrow</span>(simulated), <span class="dv">10</span>) *<span class="st"> </span><span class="dv">86400</span>
+simulated$pump &lt;-<span class="st"> </span><span class="kw">ceiling</span>(<span class="kw">runif</span>(<span class="kw">nrow</span>(simulated)) *<span class="st"> </span><span class="dv">5</span>)
+
+exampledata1&lt;-<span class="kw">head</span>(simulated)
+exampledata1</code></pre>
+<pre><code>##   case         x         y gender                date pump
+## 1    1 13.588010 11.095600 female 1854-04-13 17:47:21    5
+## 2    2  9.878124 12.559180 female 1854-04-15 19:33:56    3
+## 3    3 14.653980 10.180440   male 1854-04-14 14:58:03    1
+## 4    4 15.220570  9.993003   male 1854-04-13 21:28:25    3
+## 5    5 13.162650 12.963190   male 1854-04-16 04:48:21    3
+## 6    6 13.806170  8.889046 female 1854-04-14 14:29:14    2</code></pre>
+<p>Creating example dataframe 2.</p>
+<pre class="sourceCode r"><code class="sourceCode r">exampledata2&lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">id=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>),
+                 <span class="dt">name=</span><span class="kw">c</span>(<span class="st">&quot;Tom&quot;</span>,<span class="st">&quot;Andy&quot;</span>,<span class="st">&quot;Ellie&quot;</span>,<span class="st">&quot;Ana&quot;</span>,<span class="st">&quot;Tibo&quot;</span>),
+                 <span class="dt">dob=</span><span class="kw">c</span>(<span class="st">&quot;1981-01-12&quot;</span>,<span class="st">&quot;1980-11-11&quot;</span>,<span class="st">&quot;1982-02-10&quot;</span>,<span class="st">&quot;1981-12-09&quot;</span>,<span class="st">&quot;1983-03-08&quot;</span>),
+                 <span class="dt">gender=</span><span class="kw">c</span>(<span class="st">&quot;male&quot;</span>,<span class="st">&quot;male&quot;</span>,<span class="st">&quot;female&quot;</span>,<span class="st">&quot;female&quot;</span>,<span class="st">&quot;male&quot;</span>),
+                 <span class="dt">date.of.onset=</span><span class="kw">c</span>(<span class="st">&quot;2014-12-28&quot;</span>,<span class="st">&quot;2014-12-29&quot;</span>,<span class="st">&quot;2015-01-03&quot;</span>,<span class="st">&quot;2015-01-08&quot;</span>,<span class="st">&quot;2015-01-04&quot;</span>),
+                 <span class="dt">date.of.admission=</span><span class="kw">c</span>(<span class="ot">NA</span>,<span class="st">&quot;2015-01-05&quot;</span>,<span class="st">&quot;2015-01-12&quot;</span>,<span class="ot">NA</span>,<span class="st">&quot;2015-01-14&quot;</span>),
+                 <span class="dt">date.of.discharge=</span><span class="kw">c</span>(<span class="ot">NA</span>,<span class="ot">NA</span>,<span class="st">&quot;2015-01-17&quot;</span>,<span class="ot">NA</span>,<span class="st">&quot;2015-01-17&quot;</span>),
+                 <span class="dt">hospital=</span><span class="kw">c</span>(<span class="ot">NA</span>,<span class="st">&quot;St Marys&quot;</span>,<span class="st">&quot;Whittington&quot;</span>,<span class="ot">NA</span>,<span class="st">&quot;Whittington&quot;</span>),
+                 <span class="dt">fever=</span><span class="kw">c</span>(<span class="st">&quot;yes&quot;</span>,<span class="st">&quot;yes&quot;</span>,<span class="st">&quot;no&quot;</span>,<span class="st">&quot;no&quot;</span>,<span class="st">&quot;yes&quot;</span>),
+                 <span class="dt">sleepy=</span><span class="kw">c</span>(<span class="st">&quot;no&quot;</span>,<span class="st">&quot;yes&quot;</span>,<span class="st">&quot;yes&quot;</span>,<span class="st">&quot;no&quot;</span>,<span class="st">&quot;yes&quot;</span>),
+                 <span class="dt">contact1.id=</span><span class="kw">c</span>(<span class="st">&quot;B&quot;</span>,<span class="st">&quot;A&quot;</span>,<span class="st">&quot;5&quot;</span>,<span class="ot">NA</span>,<span class="st">&quot;3D&quot;</span>),
+                 <span class="dt">contact1.date=</span><span class="kw">c</span>(<span class="st">&quot;2014-12-26&quot;</span>,<span class="st">&quot;2014-12-26&quot;</span>,<span class="st">&quot;2014-12-28&quot;</span>,<span class="ot">NA</span>,<span class="st">&quot;2014-12-28&quot;</span>),
+                 <span class="dt">contact2.id=</span><span class="kw">c</span>(<span class="st">&quot;3D&quot;</span>,<span class="st">&quot;3D&quot;</span>,<span class="st">&quot;5&quot;</span>,<span class="ot">NA</span>,<span class="st">&quot;A&quot;</span>),
+                 <span class="dt">contact2.date=</span><span class="kw">c</span>(<span class="st">&quot;2014-12-25&quot;</span>,<span class="st">&quot;2014-12-26&quot;</span>,<span class="st">&quot;2015-01-14&quot;</span>,<span class="ot">NA</span>,<span class="st">&quot;2014-12-25&quot;</span>),
+                 <span class="dt">contact3.id=</span><span class="kw">c</span>(<span class="st">&quot;B&quot;</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,<span class="ot">NA</span>),
+                 <span class="dt">contact3.date=</span><span class="kw">c</span>(<span class="st">&quot;2015-01-08&quot;</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,<span class="ot">NA</span>)
+                 )
+            
+exampledata2</code></pre>
+<pre><code>##   id  name        dob gender date.of.onset date.of.admission
+## 1  1   Tom 1981-01-12   male    2014-12-28              &lt;NA&gt;
+## 2  2  Andy 1980-11-11   male    2014-12-29        2015-01-05
+## 3  3 Ellie 1982-02-10 female    2015-01-03        2015-01-12
+## 4  4   Ana 1981-12-09 female    2015-01-08              &lt;NA&gt;
+## 5  5  Tibo 1983-03-08   male    2015-01-04        2015-01-14
+##   date.of.discharge    hospital fever sleepy contact1.id contact1.date
+## 1              &lt;NA&gt;        &lt;NA&gt;   yes     no           B    2014-12-26
+## 2              &lt;NA&gt;    St Marys   yes    yes           A    2014-12-26
+## 3        2015-01-17 Whittington    no    yes           5    2014-12-28
+## 4              &lt;NA&gt;        &lt;NA&gt;    no     no        &lt;NA&gt;          &lt;NA&gt;
+## 5        2015-01-17 Whittington   yes    yes          3D    2014-12-28
+##   contact2.id contact2.date contact3.id contact3.date
+## 1          3D    2014-12-25           B    2015-01-08
+## 2          3D    2014-12-26        &lt;NA&gt;          &lt;NA&gt;
+## 3           5    2015-01-14        &lt;NA&gt;          &lt;NA&gt;
+## 4        &lt;NA&gt;          &lt;NA&gt;        &lt;NA&gt;          &lt;NA&gt;
+## 5           A    2014-12-25        &lt;NA&gt;          &lt;NA&gt;</code></pre>
+<div id="section" class="section level48">
+<p></p>
+</div>
+<div id="transition-1-data.frame-to-epijson-format" class="section level2">
+<h2>Transition 1: data.frame to EpiJSON format</h2>
+<div id="section-1" class="section level48">
+<p></p>
+<p>Use the <em>repijson</em> package to convert a data.frame object into a EpiJSON object within R:</p>
+<pre class="sourceCode r"><code class="sourceCode r">eg1 &lt;-<span class="st"> </span><span class="kw">as.ejObject</span>(exampledata1,    
+    <span class="dt">recordAttributes =</span> <span class="st">&quot;gender&quot;</span>,    
+    <span class="dt">eventDefinitions =</span> <span class="kw">list</span>(<span class="kw">define_ejEvent</span>(<span class="dt">date=</span><span class="st">&quot;date&quot;</span>, <span class="dt">name=</span><span class="st">&quot;Death&quot;</span>, <span class="dt">location=</span><span class="kw">list</span>(<span class="dt">x=</span><span class="st">&quot;x&quot;</span>, <span class="dt">y=</span><span class="st">&quot;y&quot;</span>, <span class="dt">proj4string=</span><span class="st">&quot;&quot;</span>), <span class="dt">attributes=</span><span class="st">&quot;pump&quot;</span>)),
+        <span class="dt">metadata=</span><span class="kw">list</span>())               
+eg1</code></pre>
+<pre><code>## {
+##     &quot;metadata&quot;: [
+## 
+##     ],
+##     &quot;records&quot;: [
+##         {
+##             &quot;id&quot;: 1,
+##             &quot;attributes&quot;: [
+##                 {
+##                     &quot;name&quot;: &quot;gender&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;female&quot;
+##                 }
+##             ],
+##             &quot;events&quot;: [
+##                 {
+##                     &quot;id&quot;: 1,
+##                     &quot;name&quot;: &quot;Death&quot;,
+##                     &quot;date&quot;: &quot;1854-04-13T17:47:21Z&quot;,
+##                     &quot;location&quot;: {
+##                         &quot;type&quot;: &quot;FeatureCollection&quot;,
+##                         &quot;features&quot;: [
+##                             {
+##                                 &quot;type&quot;: &quot;Feature&quot;,
+##                                 &quot;id&quot;: 1,
+##                                 &quot;properties&quot;: {
+##                                     &quot;dat&quot;: 1
+##                                 },
+##                                 &quot;geometry&quot;: {
+##                                     &quot;type&quot;: &quot;Point&quot;,
+##                                     &quot;coordinates&quot;: [
+##                                         13.588,
+##                                         11.0956
+##                                     ]
+##                                 }
+##                             }
+##                         ]
+##                     },
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;pump&quot;,
+##                             &quot;type&quot;: &quot;number&quot;,
+##                             &quot;value&quot;: 5
+##                         }
+##                     ]
+##                 }
+##             ]
+##         },
+##         {
+##             &quot;id&quot;: 2,
+##             &quot;attributes&quot;: [
+##                 {
+##                     &quot;name&quot;: &quot;gender&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;female&quot;
+##                 }
+##             ],
+##             &quot;events&quot;: [
+##                 {
+##                     &quot;id&quot;: 1,
+##                     &quot;name&quot;: &quot;Death&quot;,
+##                     &quot;date&quot;: &quot;1854-04-15T19:33:56Z&quot;,
+##                     &quot;location&quot;: {
+##                         &quot;type&quot;: &quot;FeatureCollection&quot;,
+##                         &quot;features&quot;: [
+##                             {
+##                                 &quot;type&quot;: &quot;Feature&quot;,
+##                                 &quot;id&quot;: 2,
+##                                 &quot;properties&quot;: {
+##                                     &quot;dat&quot;: 1
+##                                 },
+##                                 &quot;geometry&quot;: {
+##                                     &quot;type&quot;: &quot;Point&quot;,
+##                                     &quot;coordinates&quot;: [
+##                                         9.8781,
+##                                         12.5592
+##                                     ]
+##                                 }
+##                             }
+##                         ]
+##                     },
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;pump&quot;,
+##                             &quot;type&quot;: &quot;number&quot;,
+##                             &quot;value&quot;: 3
+##                         }
+##                     ]
+##                 }
+##             ]
+##         },
+##         {
+##             &quot;id&quot;: 3,
+##             &quot;attributes&quot;: [
+##                 {
+##                     &quot;name&quot;: &quot;gender&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;male&quot;
+##                 }
+##             ],
+##             &quot;events&quot;: [
+##                 {
+##                     &quot;id&quot;: 1,
+##                     &quot;name&quot;: &quot;Death&quot;,
+##                     &quot;date&quot;: &quot;1854-04-14T14:58:03Z&quot;,
+##                     &quot;location&quot;: {
+##                         &quot;type&quot;: &quot;FeatureCollection&quot;,
+##                         &quot;features&quot;: [
+##                             {
+##                                 &quot;type&quot;: &quot;Feature&quot;,
+##                                 &quot;id&quot;: 3,
+##                                 &quot;properties&quot;: {
+##                                     &quot;dat&quot;: 1
+##                                 },
+##                                 &quot;geometry&quot;: {
+##                                     &quot;type&quot;: &quot;Point&quot;,
+##                                     &quot;coordinates&quot;: [
+##                                         14.654,
+##                                         10.1804
+##                                     ]
+##                                 }
+##                             }
+##                         ]
+##                     },
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;pump&quot;,
+##                             &quot;type&quot;: &quot;number&quot;,
+##                             &quot;value&quot;: 1
+##                         }
+##                     ]
+##                 }
+##             ]
+##         },
+##         {
+##             &quot;id&quot;: 4,
+##             &quot;attributes&quot;: [
+##                 {
+##                     &quot;name&quot;: &quot;gender&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;male&quot;
+##                 }
+##             ],
+##             &quot;events&quot;: [
+##                 {
+##                     &quot;id&quot;: 1,
+##                     &quot;name&quot;: &quot;Death&quot;,
+##                     &quot;date&quot;: &quot;1854-04-13T21:28:25Z&quot;,
+##                     &quot;location&quot;: {
+##                         &quot;type&quot;: &quot;FeatureCollection&quot;,
+##                         &quot;features&quot;: [
+##                             {
+##                                 &quot;type&quot;: &quot;Feature&quot;,
+##                                 &quot;id&quot;: 4,
+##                                 &quot;properties&quot;: {
+##                                     &quot;dat&quot;: 1
+##                                 },
+##                                 &quot;geometry&quot;: {
+##                                     &quot;type&quot;: &quot;Point&quot;,
+##                                     &quot;coordinates&quot;: [
+##                                         15.2206,
+##                                         9.993
+##                                     ]
+##                                 }
+##                             }
+##                         ]
+##                     },
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;pump&quot;,
+##                             &quot;type&quot;: &quot;number&quot;,
+##                             &quot;value&quot;: 3
+##                         }
+##                     ]
+##                 }
+##             ]
+##         },
+##         {
+##             &quot;id&quot;: 5,
+##             &quot;attributes&quot;: [
+##                 {
+##                     &quot;name&quot;: &quot;gender&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;male&quot;
+##                 }
+##             ],
+##             &quot;events&quot;: [
+##                 {
+##                     &quot;id&quot;: 1,
+##                     &quot;name&quot;: &quot;Death&quot;,
+##                     &quot;date&quot;: &quot;1854-04-16T04:48:21Z&quot;,
+##                     &quot;location&quot;: {
+##                         &quot;type&quot;: &quot;FeatureCollection&quot;,
+##                         &quot;features&quot;: [
+##                             {
+##                                 &quot;type&quot;: &quot;Feature&quot;,
+##                                 &quot;id&quot;: 5,
+##                                 &quot;properties&quot;: {
+##                                     &quot;dat&quot;: 1
+##                                 },
+##                                 &quot;geometry&quot;: {
+##                                     &quot;type&quot;: &quot;Point&quot;,
+##                                     &quot;coordinates&quot;: [
+##                                         13.1626,
+##                                         12.9632
+##                                     ]
+##                                 }
+##                             }
+##                         ]
+##                     },
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;pump&quot;,
+##                             &quot;type&quot;: &quot;number&quot;,
+##                             &quot;value&quot;: 3
+##                         }
+##                     ]
+##                 }
+##             ]
+##         },
+##         {
+##             &quot;id&quot;: 6,
+##             &quot;attributes&quot;: [
+##                 {
+##                     &quot;name&quot;: &quot;gender&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;female&quot;
+##                 }
+##             ],
+##             &quot;events&quot;: [
+##                 {
+##                     &quot;id&quot;: 1,
+##                     &quot;name&quot;: &quot;Death&quot;,
+##                     &quot;date&quot;: &quot;1854-04-14T14:29:14Z&quot;,
+##                     &quot;location&quot;: {
+##                         &quot;type&quot;: &quot;FeatureCollection&quot;,
+##                         &quot;features&quot;: [
+##                             {
+##                                 &quot;type&quot;: &quot;Feature&quot;,
+##                                 &quot;id&quot;: 6,
+##                                 &quot;properties&quot;: {
+##                                     &quot;dat&quot;: 1
+##                                 },
+##                                 &quot;geometry&quot;: {
+##                                     &quot;type&quot;: &quot;Point&quot;,
+##                                     &quot;coordinates&quot;: [
+##                                         13.8062,
+##                                         8.889
+##                                     ]
+##                                 }
+##                             }
+##                         ]
+##                     },
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;pump&quot;,
+##                             &quot;type&quot;: &quot;number&quot;,
+##                             &quot;value&quot;: 2
+##                         }
+##                     ]
+##                 }
+##             ]
+##         }
+##     ]
+## }
+## </code></pre>
+<p>The <em>repijson</em> package does not convert dates represented as strings for you. This is because the process of conversion from character to date-time is fraught with difficulty and the hidden corruption of dates is much worse than being told by R to provide date objects. Here we convert the dates in the example two data to real dates. We use POSIXct as this is more firendly to data.frames.</p>
+<pre class="sourceCode r"><code class="sourceCode r">exampledata2$date.of.onset &lt;-<span class="st"> </span><span class="kw">as.POSIXct</span>(exampledata2$date.of.onset)
+exampledata2$date.of.admission &lt;-<span class="st"> </span><span class="kw">as.POSIXct</span>(exampledata2$date.of.admission)
+exampledata2$date.of.discharge &lt;-<span class="st"> </span><span class="kw">as.POSIXct</span>(exampledata2$date.of.discharge)
+exampledata2$contact1.date &lt;-<span class="st"> </span><span class="kw">as.POSIXct</span>(exampledata2$contact1.date)
+exampledata2$contact2.date &lt;-<span class="st"> </span><span class="kw">as.POSIXct</span>(exampledata2$contact2.date)
+exampledata2$contact3.date &lt;-<span class="st"> </span><span class="kw">as.POSIXct</span>(exampledata2$contact3.date)</code></pre>
+<p>We are now set to convert the exampledata2 dataframe to an EpiJSON object.</p>
+<pre class="sourceCode r"><code class="sourceCode r">eg2 &lt;-<span class="st"> </span><span class="kw">as.ejObject</span>(exampledata2, <span class="dt">recordAttributes =</span> <span class="kw">c</span>(<span class="st">&quot;id&quot;</span>,<span class="st">&quot;name&quot;</span>,<span class="st">&quot;dob&quot;</span>,<span class="st">&quot;gender&quot;</span>),
+     <span class="dt">eventDefinitions =</span> <span class="kw">list</span>(<span class="kw">define_ejEvent</span>(<span class="dt">name=</span><span class="st">&quot;Date Of Onset&quot;</span>, <span class="dt">date=</span><span class="st">&quot;date.of.onset&quot;</span>, 
+                                            <span class="dt">attributes=</span><span class="kw">list</span>()),
+                             <span class="kw">define_ejEvent</span>(<span class="dt">name=</span><span class="st">&quot;Hospital admission&quot;</span>, <span class="dt">date=</span><span class="st">&quot;date.of.admission&quot;</span>, 
+                                            <span class="dt">attributes=</span><span class="kw">list</span>(<span class="st">&quot;hospital&quot;</span>, <span class="st">&quot;fever&quot;</span>, <span class="st">&quot;sleepy&quot;</span>)),
+                             <span class="kw">define_ejEvent</span>(<span class="dt">name=</span><span class="st">&quot;Hospital discharge&quot;</span>, <span class="dt">date=</span><span class="st">&quot;date.of.discharge&quot;</span>),
+                             <span class="kw">define_ejEvent</span>(<span class="dt">name=</span><span class="st">&quot;Contact1&quot;</span>, <span class="dt">date=</span><span class="st">&quot;contact1.date&quot;</span>, <span class="dt">attributes=</span><span class="kw">list</span>(<span class="st">&quot;contact1.id&quot;</span>)),
+                             <span class="kw">define_ejEvent</span>(<span class="dt">name=</span><span class="st">&quot;Contact2&quot;</span>, <span class="dt">date=</span><span class="st">&quot;contact2.date&quot;</span>, <span class="dt">attributes=</span><span class="kw">list</span>(<span class="st">&quot;contact2.id&quot;</span>)),
+                             <span class="kw">define_ejEvent</span>(<span class="dt">name=</span><span class="st">&quot;Contact3&quot;</span>, <span class="dt">date=</span><span class="st">&quot;contact3.date&quot;</span>, <span class="dt">attributes=</span><span class="kw">list</span>(<span class="st">&quot;contact3.id&quot;</span>))
+                        ),
+        <span class="dt">metadata=</span><span class="kw">list</span>())
+eg2</code></pre>
+<pre><code>## {
+##     &quot;metadata&quot;: [
+## 
+##     ],
+##     &quot;records&quot;: [
+##         {
+##             &quot;id&quot;: 1,
+##             &quot;attributes&quot;: [
+##                 {
+##                     &quot;name&quot;: &quot;id&quot;,
+##                     &quot;type&quot;: &quot;number&quot;,
+##                     &quot;value&quot;: 1
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;name&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;Tom&quot;
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;dob&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;1981-01-12&quot;
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;gender&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;male&quot;
+##                 }
+##             ],
+##             &quot;events&quot;: [
+##                 {
+##                     &quot;id&quot;: 1,
+##                     &quot;name&quot;: &quot;Date Of Onset&quot;,
+##                     &quot;date&quot;: &quot;2014-12-28T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+## 
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 4,
+##                     &quot;name&quot;: &quot;Contact1&quot;,
+##                     &quot;date&quot;: &quot;2014-12-26T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;contact1.id&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;B&quot;
+##                         }
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 5,
+##                     &quot;name&quot;: &quot;Contact2&quot;,
+##                     &quot;date&quot;: &quot;2014-12-25T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;contact2.id&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;3D&quot;
+##                         }
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 6,
+##                     &quot;name&quot;: &quot;Contact3&quot;,
+##                     &quot;date&quot;: &quot;2015-01-08T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;contact3.id&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;B&quot;
+##                         }
+##                     ]
+##                 }
+##             ]
+##         },
+##         {
+##             &quot;id&quot;: 2,
+##             &quot;attributes&quot;: [
+##                 {
+##                     &quot;name&quot;: &quot;id&quot;,
+##                     &quot;type&quot;: &quot;number&quot;,
+##                     &quot;value&quot;: 2
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;name&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;Andy&quot;
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;dob&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;1980-11-11&quot;
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;gender&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;male&quot;
+##                 }
+##             ],
+##             &quot;events&quot;: [
+##                 {
+##                     &quot;id&quot;: 1,
+##                     &quot;name&quot;: &quot;Date Of Onset&quot;,
+##                     &quot;date&quot;: &quot;2014-12-29T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+## 
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 2,
+##                     &quot;name&quot;: &quot;Hospital admission&quot;,
+##                     &quot;date&quot;: &quot;2015-01-05T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;hospital&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;St Marys&quot;
+##                         },
+##                         {
+##                             &quot;name&quot;: &quot;fever&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;yes&quot;
+##                         },
+##                         {
+##                             &quot;name&quot;: &quot;sleepy&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;yes&quot;
+##                         }
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 4,
+##                     &quot;name&quot;: &quot;Contact1&quot;,
+##                     &quot;date&quot;: &quot;2014-12-26T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;contact1.id&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;A&quot;
+##                         }
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 5,
+##                     &quot;name&quot;: &quot;Contact2&quot;,
+##                     &quot;date&quot;: &quot;2014-12-26T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;contact2.id&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;3D&quot;
+##                         }
+##                     ]
+##                 }
+##             ]
+##         },
+##         {
+##             &quot;id&quot;: 3,
+##             &quot;attributes&quot;: [
+##                 {
+##                     &quot;name&quot;: &quot;id&quot;,
+##                     &quot;type&quot;: &quot;number&quot;,
+##                     &quot;value&quot;: 3
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;name&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;Ellie&quot;
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;dob&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;1982-02-10&quot;
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;gender&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;female&quot;
+##                 }
+##             ],
+##             &quot;events&quot;: [
+##                 {
+##                     &quot;id&quot;: 1,
+##                     &quot;name&quot;: &quot;Date Of Onset&quot;,
+##                     &quot;date&quot;: &quot;2015-01-03T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+## 
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 2,
+##                     &quot;name&quot;: &quot;Hospital admission&quot;,
+##                     &quot;date&quot;: &quot;2015-01-12T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;hospital&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;Whittington&quot;
+##                         },
+##                         {
+##                             &quot;name&quot;: &quot;fever&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;no&quot;
+##                         },
+##                         {
+##                             &quot;name&quot;: &quot;sleepy&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;yes&quot;
+##                         }
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 3,
+##                     &quot;name&quot;: &quot;Hospital discharge&quot;,
+##                     &quot;date&quot;: &quot;2015-01-17T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+## 
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 4,
+##                     &quot;name&quot;: &quot;Contact1&quot;,
+##                     &quot;date&quot;: &quot;2014-12-28T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;contact1.id&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;5&quot;
+##                         }
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 5,
+##                     &quot;name&quot;: &quot;Contact2&quot;,
+##                     &quot;date&quot;: &quot;2015-01-14T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;contact2.id&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;5&quot;
+##                         }
+##                     ]
+##                 }
+##             ]
+##         },
+##         {
+##             &quot;id&quot;: 4,
+##             &quot;attributes&quot;: [
+##                 {
+##                     &quot;name&quot;: &quot;id&quot;,
+##                     &quot;type&quot;: &quot;number&quot;,
+##                     &quot;value&quot;: 4
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;name&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;Ana&quot;
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;dob&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;1981-12-09&quot;
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;gender&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;female&quot;
+##                 }
+##             ],
+##             &quot;events&quot;: [
+##                 {
+##                     &quot;id&quot;: 1,
+##                     &quot;name&quot;: &quot;Date Of Onset&quot;,
+##                     &quot;date&quot;: &quot;2015-01-08T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+## 
+##                     ]
+##                 }
+##             ]
+##         },
+##         {
+##             &quot;id&quot;: 5,
+##             &quot;attributes&quot;: [
+##                 {
+##                     &quot;name&quot;: &quot;id&quot;,
+##                     &quot;type&quot;: &quot;number&quot;,
+##                     &quot;value&quot;: 5
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;name&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;Tibo&quot;
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;dob&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;1983-03-08&quot;
+##                 },
+##                 {
+##                     &quot;name&quot;: &quot;gender&quot;,
+##                     &quot;type&quot;: &quot;string&quot;,
+##                     &quot;value&quot;: &quot;male&quot;
+##                 }
+##             ],
+##             &quot;events&quot;: [
+##                 {
+##                     &quot;id&quot;: 1,
+##                     &quot;name&quot;: &quot;Date Of Onset&quot;,
+##                     &quot;date&quot;: &quot;2015-01-04T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+## 
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 2,
+##                     &quot;name&quot;: &quot;Hospital admission&quot;,
+##                     &quot;date&quot;: &quot;2015-01-14T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;hospital&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;Whittington&quot;
+##                         },
+##                         {
+##                             &quot;name&quot;: &quot;fever&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;yes&quot;
+##                         },
+##                         {
+##                             &quot;name&quot;: &quot;sleepy&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;yes&quot;
+##                         }
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 3,
+##                     &quot;name&quot;: &quot;Hospital discharge&quot;,
+##                     &quot;date&quot;: &quot;2015-01-17T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+## 
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 4,
+##                     &quot;name&quot;: &quot;Contact1&quot;,
+##                     &quot;date&quot;: &quot;2014-12-28T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;contact1.id&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;3D&quot;
+##                         }
+##                     ]
+##                 },
+##                 {
+##                     &quot;id&quot;: 5,
+##                     &quot;name&quot;: &quot;Contact2&quot;,
+##                     &quot;date&quot;: &quot;2014-12-25T00:00:00Z&quot;,
+##                     &quot;attributes&quot;: [
+##                         {
+##                             &quot;name&quot;: &quot;contact2.id&quot;,
+##                             &quot;type&quot;: &quot;string&quot;,
+##                             &quot;value&quot;: &quot;A&quot;
+##                         }
+##                     ]
+##                 }
+##             ]
+##         }
+##     ]
+## }
+## </code></pre>
+<div id="section-2" class="section level55">
+<p></p>
+</div>
+</div>
+</div>
+<div id="transition-2-epijson-object-to-data.frame-format" class="section level2">
+<h2>Transition 2: EpiJSON object to data.frame format</h2>
+<div id="section-3" class="section level55">
+<p></p>
+<p>Use the <em>repijson</em> package to convert a JSON object into a data.frame object:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">as.data.frame</span>(eg1)</code></pre>
+<pre><code>##   id gender          Death_date Death_locationX Death_locationY
+## 1  1 female 1854-04-13 17:47:21       13.588010       11.095600
+## 2  2 female 1854-04-15 19:33:56        9.878124       12.559180
+## 3  3   male 1854-04-14 14:58:03       14.653980       10.180440
+## 4  4   male 1854-04-13 21:28:25       15.220570        9.993003
+## 5  5   male 1854-04-16 04:48:21       13.162650       12.963190
+## 6  6 female 1854-04-14 14:29:14       13.806170        8.889046
+##   Death_locationCRS pump
+## 1              &lt;NA&gt;    5
+## 2              &lt;NA&gt;    3
+## 3              &lt;NA&gt;    1
+## 4              &lt;NA&gt;    3
+## 5              &lt;NA&gt;    3
+## 6              &lt;NA&gt;    2</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">as.data.frame</span>(eg2)</code></pre>
+<pre><code>##   id id.1  name        dob gender Date.Of.Onset_date Contact1_date
+## 1  1    1   Tom 1981-01-12   male         2014-12-28    2014-12-26
+## 2  2    2  Andy 1980-11-11   male         2014-12-29    2014-12-26
+## 3  3    3 Ellie 1982-02-10 female         2015-01-03    2014-12-28
+## 4  4    4   Ana 1981-12-09 female         2015-01-08          &lt;NA&gt;
+## 5  5    5  Tibo 1983-03-08   male         2015-01-04    2014-12-28
+##   contact1.id Contact2_date contact2.id Contact3_date contact3.id
+## 1           B    2014-12-25          3D    2015-01-08           B
+## 2           A    2014-12-26          3D          &lt;NA&gt;        &lt;NA&gt;
+## 3           5    2015-01-14           5          &lt;NA&gt;        &lt;NA&gt;
+## 4        &lt;NA&gt;          &lt;NA&gt;        &lt;NA&gt;          &lt;NA&gt;        &lt;NA&gt;
+## 5          3D    2014-12-25           A          &lt;NA&gt;        &lt;NA&gt;
+##   Hospital.admission_date    hospital fever sleepy Hospital.discharge_date
+## 1                    &lt;NA&gt;        &lt;NA&gt;  &lt;NA&gt;   &lt;NA&gt;                    &lt;NA&gt;
+## 2              2015-01-05    St Marys   yes    yes                    &lt;NA&gt;
+## 3              2015-01-12 Whittington    no    yes              2015-01-17
+## 4                    &lt;NA&gt;        &lt;NA&gt;  &lt;NA&gt;   &lt;NA&gt;                    &lt;NA&gt;
+## 5              2015-01-14 Whittington   yes    yes              2015-01-17</code></pre>
+</div>
+<div id="section-4" class="section level55">
+<p></p>
+</div>
+</div>
+<div id="transition-3-from-obkdata-to-an-epijson-object" class="section level2">
+<h2>Transition 3: From obkData to an EpiJSON object</h2>
+<div id="section-5" class="section level55">
+<p></p>
+<p>These are example data in obkData format</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(ToyOutbreak) </code></pre>
+<p>Use the <em>repijson</em> package to convert an obkData object to JSON object into :</p>
+<pre class="sourceCode r"><code class="sourceCode r">eg3 &lt;-<span class="st"> </span><span class="kw">as.ejObject</span>(ToyOutbreak)</code></pre>
+</div>
+<div id="section-6" class="section level55">
+<p></p>
+</div>
+</div>
+<div id="transition-4-from-an-epijson-object-to-obkdata" class="section level2">
+<h2>Transition 4: From an EpiJSON object to obkData</h2>
+<div id="section-7" class="section level55">
+<p></p>
+<p><em>Next function to produce</em></p>
+</div>
+<div id="section-8" class="section level55">
+<p></p>
+</div>
+</div>
+<div id="transition-5-from-an-epijson-object-to-spatial" class="section level2">
+<h2>Transition 5: From an EpiJSON object to spatial</h2>
+<div id="section-9" class="section level55">
+<p></p>
+<p>Use the <em>repijson</em> package to convert from an EpiJSON object to spatial (sp). Here we get the location of all the events as a SpatialPointsDataFrame</p>
+<pre class="sourceCode r"><code class="sourceCode r">sp_eg1 &lt;-<span class="st"> </span><span class="kw">as.SpatialPointsDataFrame.ejObject</span>(eg1)
+<span class="kw">plot</span>(sp_eg1,<span class="dt">pch=</span><span class="dv">20</span>,<span class="dt">col=</span><span class="st">&quot;green&quot;</span>)
+<span class="kw">text</span>(<span class="dv">10</span>,<span class="dv">17</span>,<span class="st">&quot;Example from Snow Deaths data&quot;</span>)</code></pre>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAABlBMVEUA/wD///9vvVhRAAAACXBIWXMAAA7DAAAOwwHHb6hkAAACiklEQVR4nO3bQY6DMBAAQef/n94fpBWFcTBbfce2SmISIVgvvW39+gB3D1AEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYCi84DW2nrm44DW2isEqPbbuNclAarMoHsFKAIUAYoARYCiYaDNv8kDzZ5/97+6gQBFgCIzKDr9/OMBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoOhpox+tZJwNtecEPUG0yvcFggCoz6AYBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBip4KdNnT2IcCXfc8H1CtdMkqtwtQZQZ91Bdc/wLomxsOUF176UluGqDKDJoLUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFDwCa/TDzfKDhT3sB1fJzS28KUGUG/TRAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUAQoAhQBigBFgCJAEaAIUPQHEZhDkvjhk6kAAAAASUVORK5CYII=" /></p>
+</div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
